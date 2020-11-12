@@ -3,18 +3,10 @@
 */
 
 // Includes
-#include <Arduino.h>
-#include <Wire.h> // I2C library
-//#include <SPI.h>
-#include "SparkFunBME280.h" // BME280 library
-#include <rn2xx3.h> // RN2483 LoRa radio library
+#include "init.h"
+#include "bme280.h"
+//#include "LoRaWAN.h" // Disable for testing outside of LoRa range
 
-// Variable Definitiions
-#define LED_PIN_0 PIN_PD0
-#define LED_PIN_1 PIN_PD1
-
-// Class Instantiations
-BME280 mySensor;
 
 // Function Declarations
 void ledInit();
@@ -25,80 +17,63 @@ void setup()
 {
 	ledInit();
 
-	//Serial1.begin(9600);
-	Serial2.begin(9600);
+	usbUSART.begin(9600);
+	loraUSART.begin(57600);
+	//while (!usbUSART && !loraUSART){}
+	delay(2000); // Wait for USART to come up. 
 
-	Wire.pins(PIN_PA2, PIN_PA3);
-	Wire.begin(); // Start the I2C interface
-	//Wire.setClock(400000); //Increase to fast I2C speed!
-	Wire.setClock(100000);
+	usbUSART.println("Weather Station Prototype 1");
 
+	//INIT_TTN(); // Initialise the LoRa radio & connect to network // Disable for testing outside of LoRa range
 
-	mySensor.setI2CAddress(0x76);
-	mySensor.beginI2C();
-	//mySensor.beginI2C(); // Start the I2C interface on the BME
-	mySensor.setMode(MODE_SLEEP); // Set BME to sleep
+	I2C_INIT(); // Initialise the I2C interface
+	BME_INIT(); // Init the BME sensor on the I2C bus and set the sensor to low power sleep
+	
+	uint8_t *payload = (uint8_t *) 200; // TTN test payload
+	
+	//ttn.sendBytes(payload, sizeof(payload));
+	delay(2000);
 }
 
 void loop()
 {
 	ledBlink();
 
-	//Serial1.println("Serial1 Test");
-	Serial2.println("Weather Station Prototype 1");
-	delay(500);
-
-
-	mySensor.setMode(MODE_FORCED); //Wake up sensor and take reading
-
-	long startTime = millis();
-	while(mySensor.isMeasuring() == false) ; //Wait for sensor to start measurment
-	while(mySensor.isMeasuring() == true) ; //Hang out while sensor completes the reading    
-	long endTime = millis();
-
-	//Sensor is now back asleep but we get get the data
-
-	Serial2.print(" Measure time(ms): ");
-	Serial2.print(endTime - startTime);
-
-	Serial2.print(" Humidity: ");
-	Serial2.print(mySensor.readFloatHumidity(), 0);
-
-	Serial2.print(" Pressure: ");
-	Serial2.print(mySensor.readFloatPressure(), 0);
-
-	Serial2.print(" Alt: ");
-	Serial2.print(mySensor.readFloatAltitudeMeters(), 1);
-	//Serial2.print(mySensor.readFloatAltitudeFeet(), 1);
-
-	Serial2.print(" Temp: ");
-	Serial2.print(mySensor.readTempC(), 2);
-	//Serial2.print(mySensor.readTempF(), 2);
-	Serial2.println("");
-
-	delay(5000);
-
-
-}
-
-
-void ledInit()
-{
-	// initialize LED digital pin as an output.
-	pinMode(LED_PIN_0, OUTPUT);
-	pinMode(LED_PIN_1, OUTPUT);
-}
-
-void ledBlink()
-{
-	// turn the LED on (HIGH is the voltage level)
-	digitalWrite(LED_PIN_0, HIGH);
-	digitalWrite(LED_PIN_1, LOW);
+	BME_READ(); // Read data from the BME and return to sleep
 	
-	// wait for a second
+	usbUSART.print(" Measure time(ms): ");
+	usbUSART.print(md.endTime - md.startTime);
+	
+	float h = BME_GET_HUMIDITY();
+	float p = BME_GET_PRESSURE();
+	float a = BME_GET_ALT_M();
+	float t = BME_GET_TEMP_C();
+	float rp = BME_GET_REF_PRESSURE();
+	float dp = BME_GET_DEWPOINT_C();
+
+	usbUSART.print(" Humidity: ");
+	usbUSART.print(h, 0);
+	
+	usbUSART.print(" Pressure: ");
+	usbUSART.print(p, 0);
+	
+	usbUSART.print(" Alt: ");
+	usbUSART.print(a, 1);
+	
+	usbUSART.print(" Temp: ");
+	usbUSART.print(t, 2);
+
+	usbUSART.print(" Dew Point: ");
+	usbUSART.print(dp, 2);
+
+	usbUSART.println("");
+	
+	usbUSART.print(" Reference pressure: ");
+	usbUSART.print(rp, 0);
+	usbUSART.println("");
+
+	//usbUSART.println("TXing");
+    //ttn.sendBytes(payload, sizeof(payload)); //one byte, blocking function
+
 	delay(1000);
-	
-	// turn the LED off by making the voltage LOW
-	digitalWrite(LED_PIN_0, LOW);
-	digitalWrite(LED_PIN_1, HIGH);
 }
