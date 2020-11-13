@@ -1,0 +1,4 @@
+
+void ADC_INIT();
+long ADC_GET_SINGLE_ENDED(int);
+long ADC_GET_DIFFERENTIAL_2_3();

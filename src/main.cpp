@@ -6,11 +6,11 @@
 #include "init.h"
 #include "bme280.h"
 //#include "LoRaWAN.h" // Disable for testing outside of LoRa range
+#include "adc.h"
 
 
 // Function Declarations
-void ledInit();
-void ledBlink();
+
 
 // Body
 void setup()
@@ -19,7 +19,7 @@ void setup()
 
 	usbUSART.begin(9600);
 	loraUSART.begin(57600);
-	//while (!usbUSART && !loraUSART){}
+
 	delay(2000); // Wait for USART to come up. 
 
 	usbUSART.println("Weather Station Prototype 1");
@@ -28,7 +28,8 @@ void setup()
 
 	I2C_INIT(); // Initialise the I2C interface
 	BME_INIT(); // Init the BME sensor on the I2C bus and set the sensor to low power sleep
-	
+	ADC_INIT();
+
 	uint8_t *payload = (uint8_t *) 200; // TTN test payload
 	
 	//ttn.sendBytes(payload, sizeof(payload));
@@ -71,6 +72,14 @@ void loop()
 	usbUSART.print(" Reference pressure: ");
 	usbUSART.print(rp, 0);
 	usbUSART.println("");
+
+
+	long rainDetect = ADC_GET_SINGLE_ENDED(3);
+
+	usbUSART.print("Single ended result: ");
+	usbUSART.print(rainDetect,5);
+	usbUSART.println("");
+
 
 	//usbUSART.println("TXing");
     //ttn.sendBytes(payload, sizeof(payload)); //one byte, blocking function
