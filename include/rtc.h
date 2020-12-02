@@ -5,7 +5,13 @@
 	Author: Ethan Bellmer
 */
 
+#include <Arduino.h> // Workaround for byte not declared error
 
 // Function Definition
-void INIT_RTC();
-void RTC_SET_INTERVAL(int);
+void RTC_INIT(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, byte month, byte year);
+void RTC_SET_TIMER(int interval);
+void RTC_SLEEP(int interval);
+void RTC_WAKE(int interval);
+void RTC_INT_CLEAR(int interval);
+//void RTC_SET_TIME(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, byte month, byte year);
+//void RTC_READ_TIME(byte *second, byte *minute, byte *hour, byte *dayOfWeek, byte *dayOfMonth, byte *month, byte *year);
