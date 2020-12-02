@@ -14,7 +14,7 @@
 
 
 // Function Definition
-void RTC_INIT();
+void RTC_INIT(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, byte month, byte year);
 void RTC_SET_TIMER(int interval);
 void RTC_SLEEP(int interval);
 void RTC_WAKE(int interval);
@@ -34,15 +34,14 @@ void RTC_INIT(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMon
 	uint8_t configData01;
 	uint8_t configData02;
 	
-	
+
 	// Set the configuration for config register 1.
 	configData01 = readRegister(CONFIG_REG_01); // Config_reg1 (0x00)
 	/* 
 		Exit software reset - SWRSTN = 1 in BIT 0
 		Enable oscillator - OSCONZ = 0 in BIT 3
-		External Clock Freq - CLKSEL = 32.768 - 1 in BIT 5 & 0 in BIT 4 
 	*/
-	configData01 &= ~((1 << 5) | (0 << 4) | (0 << 3) | (1 << 0));
+	configData01 &= ~((0 << 3) | (1 << 0));
 	writeRegister(CONFIG_REG_01, configData01); // Write the modified config to the config register.
 
 	RTC_SET_TIME(second, minute, hour, dayOfWeek, dayOfMonth, month, year); // Write RTC time to registers 0x06-0x0C.
@@ -52,8 +51,6 @@ void RTC_INIT(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMon
 	configData02 = readRegister(CONFIG_REG_02); // Config_reg2 (0x01)
 	/*
 		Write SET_RTC = 1.
-		Wire.write((byte) B00000010);
-		//Wire.write(0x02);
 	*/
 	configData02 &= ~((1 << 1));
 	writeRegister(CONFIG_REG_02, configData02);
