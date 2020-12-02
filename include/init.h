@@ -8,7 +8,6 @@
 #include <Arduino.h>
 #include "usart.h"
 #include <Wire.h> // I2C library
-//#include <SPI.h>
 #include "led.h"
 #include "rtc.h"
 #include <avr/sleep.h>
