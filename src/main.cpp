@@ -1,15 +1,21 @@
-/*
-
+/* 
+	Title: Main.cpp
+	Description: 
+	Date: 09/11/2020
+	Author: Ethan Bellmer 
 */
 
-// Includes
+// Library Includes
 #include "init.h"
 #include "bme280.h"
-//#include "LoRaWAN.h" // Disable for testing outside of LoRa range
+#include "LoRaWAN.h" // Disable for testing outside of LoRa range
 #include "adc.h"
+#include "lowPower.h"
 
 
+// Variable Declarations
 // Function Declarations
+
 
 
 // Body
@@ -24,13 +30,18 @@ void setup()
 
 	usbUSART.println("Weather Station Prototype 1");
 
-	//INIT_TTN(); // Initialise the LoRa radio & connect to network // Disable for testing outside of LoRa range
+	INIT_TTN(); // Initialise the LoRa radio & connect to network // Disable for testing outside of LoRa range
 
 	I2C_INIT(); // Initialise the I2C interface
+	RTC_INIT(00,00,13,02,01,12,2020); // Init the RTC module // TODO: #1 Get datetime from TTN
+	MCU_SET_INT(); // Set pin interrupt for waking from sleep
 	BME_INIT(); // Init the BME sensor on the I2C bus and set the sensor to low power sleep
-	ADC_INIT();
+	SENSOR_ADC_INIT(); // Init the sensor ADC 
+	
 
-	uint8_t *payload = (uint8_t *) 200; // TTN test payload
+	RTC_SET_TIMER(10);
+
+	//uint8_t *payload = (uint8_t *) 200; // TTN test payload
 	
 	//ttn.sendBytes(payload, sizeof(payload));
 	delay(2000);
@@ -74,15 +85,28 @@ void loop()
 	usbUSART.println("");
 
 
-	long rainDetect = ADC_GET_SINGLE_ENDED(3);
+	long rainDetect = SENSOR_ADC_GET_CHANNEL(0);
+	long ch3 = SENSOR_ADC_GET_CHANNEL(3);
+	long ch1 = SENSOR_ADC_GET_CHANNEL(1);
+	long ch2 = SENSOR_ADC_GET_CHANNEL(2);
 
-	usbUSART.print("Single ended result: ");
+	usbUSART.print("Rain Detect (ch0): ");
 	usbUSART.print(rainDetect,5);
+
+	usbUSART.print(" CH1: ");
+	usbUSART.print(ch1,5);
+
+	usbUSART.print(" CH2: ");
+	usbUSART.print(ch2,5);
+
+	usbUSART.print(" CH3: ");
+	usbUSART.print(ch3,5);
+
 	usbUSART.println("");
 
 
 	//usbUSART.println("TXing");
-    //ttn.sendBytes(payload, sizeof(payload)); //one byte, blocking function
+	//ttn.sendBytes(payload, sizeof(payload)); //one byte, blocking function
 
 	delay(1000);
 }
