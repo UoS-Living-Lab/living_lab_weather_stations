@@ -1,4 +1,8 @@
-/*
+/* 
+	Title: Init.cpp
+	Description: 
+	Date: 11/11/2020
+	Author: Ethan Bellmer 
 */
 
 #include "init.h"
