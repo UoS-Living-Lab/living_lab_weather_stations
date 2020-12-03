@@ -7,15 +7,10 @@
 #include "ttn-otaa-credentials.h"
 #include "ttn-apb-credentials.h"
 
-#define OTAA 1 // TODO: #2 OTAA not working with TTN Gateway
+#define OTAA 0 // TODO: #2 OTAA not working with TTN Gateway
 
 void INIT_TTN()
 {
-		// Wait a maximum of 10s for Serial Monitor
-	//while (!usbUSART && millis() < 10000)
-	//	;
-
-
 	if (OTAA)
 	{
 		usbUSART.println("-- STATUS");
