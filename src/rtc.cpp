@@ -41,7 +41,8 @@ void RTC_INIT(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMon
 		Exit software reset - SWRSTN = 1 in BIT 0
 		Enable oscillator - OSCONZ = 0 in BIT 3
 	*/
-	configData01 &= ~((0 << 3) | (1 << 0));
+	//configData01 &= ~((1 << 3) | (1 << 0));
+	configData01 |= ~((0 << 3) | (1 << 0));
 	writeRegister(CONFIG_REG_01, configData01); // Write the modified config to the config register.
 
 	RTC_SET_TIME(second, minute, hour, dayOfWeek, dayOfMonth, month, year); // Write RTC time to registers 0x06-0x0C.
@@ -52,7 +53,7 @@ void RTC_INIT(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMon
 	/*
 		Write SET_RTC = 1.
 	*/
-	configData02 &= ~((1 << 1));
+	configData02 |= ~((1 << 1));
 	writeRegister(CONFIG_REG_02, configData02);
 
 	delay(10); // Delay for 10ms to allow RTC to transition RTC enable.
@@ -61,7 +62,7 @@ void RTC_INIT(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMon
 	/*
 		Write SET_RTC = 0
 	*/
-	configData02 &= ~((0 << 1));
+	configData02 |= ~((0 << 1));
 	writeRegister(CONFIG_REG_02, configData02); // Write the modified config to the config register.
 }
 
@@ -80,7 +81,7 @@ void RTC_SET_TIMER(int interval)
 
 
 	timerConfigData = readRegister(TIMER_REG); // 03h (Timer_config)
-	timerConfigData &= ~((1 << 4)); // Enable timer countdown (1 in BIT 4)
+	timerConfigData |= ~((1 << 4)); // Enable timer countdown (1 in BIT 4)
 	writeRegister(TIMER_REG, timerConfigData); // Write the modified config to the timer config register.
 }
 
@@ -139,7 +140,7 @@ void RTC_INT_CLEAR()
 	uint8_t INT_REG = 0x04;
 
 	uint8_t intData = readRegister(INT_REG); // Interrupt register (0x04)
-	intData &= ~((1 << 2) | (1 << 0));
+	intData |= ~((1 << 2) | (1 << 0));
 	writeRegister(INT_REG, intData); // Write the modified config to the config register.
 }
 
