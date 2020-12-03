@@ -47,13 +47,13 @@ void POWER_ADC_INIT()
 	powerADC.setVoltageReference(REF_EXTERNAL);
 }
 
-long SENSOR_ADC_GET_CHANNEL(int chan)
+float SENSOR_ADC_GET_CHANNEL(int chan)
 {
-	//return sensorADC.readSingleEnded(chan)*2.048/pow(2,23);
-	return sensorADC.readSingleEnded(chan);
+	return sensorADC.readSingleEnded(chan)*2.048/pow(2,23);
+	//return sensorADC.readSingleEnded(chan);
 }
 
-long ADC_GET_DIFFERENTIAL_2_3()
+float ADC_GET_DIFFERENTIAL_2_3()
 {
 	//return sensorADC.readDifferential_2_3()*2.048/pow(2,23);
 	return sensorADC.readDifferential_2_3();
