@@ -30,7 +30,7 @@ void setup()
 
 	usbUSART.println("Weather Station Prototype 1");
 
-	INIT_TTN(); // Initialise the LoRa radio & connect to network // Disable for testing outside of LoRa range
+	//INIT_TTN(); // Initialise the LoRa radio & connect to network // Disable for testing outside of LoRa range
 
 	I2C_INIT(); // Initialise the I2C interface
 	RTC_INIT(00,00,13,02,01,12,2020); // Init the RTC module // TODO: #1 Get datetime from TTN
@@ -39,10 +39,14 @@ void setup()
 	SENSOR_ADC_INIT(); // Init the sensor ADC 
 	
 
-	RTC_SET_TIMER(10);
+	RTC_SET_TIMER(1);
 
 	//uint8_t *payload = (uint8_t *) 200; // TTN test payload
 	
+
+	pinMode(PIN_PD2, INPUT);
+
+
 	//ttn.sendBytes(payload, sizeof(payload));
 	delay(2000);
 }
@@ -53,8 +57,8 @@ void loop()
 
 	BME_READ(); // Read data from the BME and return to sleep
 	
-	usbUSART.print(" Measure time(ms): ");
-	usbUSART.print(md.endTime - md.startTime);
+	//usbUSART.print(" Measure time(ms): ");
+	//usbUSART.print(md.endTime - md.startTime);
 	
 	float h = BME_GET_HUMIDITY();
 	float p = BME_GET_PRESSURE();
@@ -63,6 +67,7 @@ void loop()
 	float rp = BME_GET_REF_PRESSURE();
 	float dp = BME_GET_DEWPOINT_C();
 
+	/*
 	usbUSART.print(" Humidity: ");
 	usbUSART.print(h, 0);
 	
@@ -83,12 +88,14 @@ void loop()
 	usbUSART.print(" Reference pressure: ");
 	usbUSART.print(rp, 0);
 	usbUSART.println("");
+	*/
 
+	float rainDetect = SENSOR_ADC_GET_CHANNEL(0);
+	float ch3 = SENSOR_ADC_GET_CHANNEL(3);
+	float ch1 = SENSOR_ADC_GET_CHANNEL(1);
+	float ch2 = SENSOR_ADC_GET_CHANNEL(2);
 
-	long rainDetect = SENSOR_ADC_GET_CHANNEL(0);
-	long ch3 = SENSOR_ADC_GET_CHANNEL(3);
-	long ch1 = SENSOR_ADC_GET_CHANNEL(1);
-	long ch2 = SENSOR_ADC_GET_CHANNEL(2);
+	usbUSART.println("");
 
 	usbUSART.print("Rain Detect (ch0): ");
 	usbUSART.print(rainDetect,5);
@@ -105,8 +112,25 @@ void loop()
 	usbUSART.println("");
 
 
+	usbUSART.print("INT PIN: ");
+	uint8_t INT_PIN = digitalRead(PIN_PD2);
+	usbUSART.print(INT_PIN);
+
+	usbUSART.print(" 0x00: ");
+	uint8_t tmp = readRegister(0x00);
+	usbUSART.print(tmp);
+
+	usbUSART.print(" 0x01: ");
+	tmp = readRegister(0x01);
+	usbUSART.print(tmp);
+	
+	usbUSART.print(" 0x03: ");
+	tmp = readRegister(0x03);
+	usbUSART.print(tmp);
+	usbUSART.println("");
+
 	//usbUSART.println("TXing");
 	//ttn.sendBytes(payload, sizeof(payload)); //one byte, blocking function
 
-	delay(1000);
+	delay(5000);
 }
