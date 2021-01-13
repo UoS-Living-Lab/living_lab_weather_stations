@@ -5,6 +5,7 @@
 	Author: Ethan Bellmer 
 */
 
-void MCU_SET_INT();
+
 void MCU_SLEEP();
 void MCU_WAKE_INT();
+void MCU_ATTACH_INTERRUPT();
