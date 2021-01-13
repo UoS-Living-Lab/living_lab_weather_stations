@@ -11,25 +11,41 @@
 
 #define INT_PIN PIN_PD2
 
-void MCU_SET_INT()
+
+void MCU_ATTACH_INTERRUPT()
 {
-    pinMode(INT_PIN, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(INT_PIN), MCU_WAKE_INT, RISING); // Set pin interrupt for waking from sleep
+	attachInterrupt(digitalPinToInterrupt(INT_PIN), MCU_WAKE_INT, LOW); // Set pin interrupt for waking from sleep
+}
+
+void MCU_DETECH_INTERRUPT()
+{
+	detachInterrupt(digitalPinToInterrupt(INT_PIN));
 }
 
 void MCU_SLEEP()
 {
 	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 	sleep_enable();
+	MCU_ATTACH_INTERRUPT();
 	usbUSART.println("going to sleep ...");
 	delay(50);
-	sleep_cpu();
+	sleep_mode();
+	//sleep_cpu();
+
+	sleep_disable();
+	MCU_DETECH_INTERRUPT();
+
+	delay(2000);
+	usbUSART.println("Waking up...");
 }
 
 void MCU_WAKE_INT()
 {
-	Serial.println("Interrupt");
+	/*
 	sleep_disable();
+	MCU_DETECH_INTERRUPT();
+	Serial.println("Interrupt");
 	delay(2000);
 	usbUSART.println("Waking up...");
+	*/
 }
