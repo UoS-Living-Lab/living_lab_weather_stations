@@ -29,7 +29,7 @@ void setup()
 
 	usbUSART.println("Weather Station Prototype 1");
 
-	//INIT_TTN(); // Initialise the LoRa radio & connect to network // Disable for testing outside of LoRa range
+	INIT_TTN(); // Initialise the LoRa radio & connect to network // Disable for testing outside of LoRa range
 
 	I2C_INIT(); // Initialise the I2C interface
 
@@ -44,14 +44,15 @@ void setup()
 	RTC_DISABLE_ALARM_1(); // Disable Alarm 1 interrupt in case it is active.
 	RTC_ENABLE_ALARM_2(); // Enable Alarm 2 interrupts
 	RTC_SET_ALARM_2();
-	RTC_CLEAR_STATUS();
-	//uint8_t *payload = (uint8_t *) 200; // TTN test payload	
+	RTC_CLEAR_STATUS();	
 
 	MCU_ATTACH_INTERRUPT();	// Set pin interrupt for waking from sleep
 	
 
-	//ttn.sendBytes(payload, sizeof(payload));
-	//delay(2000);
+	uint8_t payload[1];
+	payload[1] = 0xFF; // TTN test payload
+	ttn.sendBytes(payload, sizeof(payload));
+	delay(50);
 }
 
 void loop()
@@ -59,9 +60,6 @@ void loop()
 	//ledBlink();
 
 	BME_READ(); // Read data from the BME and return to sleep
-	
-	//usbUSART.print(" Measure time(ms): ");
-	//usbUSART.print(md.endTime - md.startTime);
 	
 	float h = BME_GET_HUMIDITY();
 	float p = BME_GET_PRESSURE();
@@ -71,6 +69,7 @@ void loop()
 	float dp = BME_GET_DEWPOINT_C();
 
 	// BME280 Testing
+
 	usbUSART.print("Humidity: ");
 	usbUSART.print(h, 0);	
 	usbUSART.print(" Pressure: ");
@@ -84,6 +83,7 @@ void loop()
 	usbUSART.print(" Reference pressure: ");
 	usbUSART.println(rp, 0);
 	usbUSART.println("");
+
 
 	float rainDetect = SENSOR_ADC_GET_CHANNEL(0);
 	float ch3 = SENSOR_ADC_GET_CHANNEL(3);
@@ -103,9 +103,27 @@ void loop()
 	usbUSART.println("");
 
 	// RTC Testing
+	/*
 	usbUSART.print("RTC Testing - ");
 	usbUSART.print("INT PIN: ");
 	usbUSART.println(digitalRead(PIN_PD2));
+	*/
+	
+	uint16_t ttemp = t * 100;
+
+	// Split word (16 bits) into 2 bytes of 8
+	uint8_t payload[2];
+	payload[0] = highByte(ttemp);
+	payload[1] = lowByte(ttemp);
+
+	ttn.sendBytes(payload, sizeof(payload));
+
+	uint16_t dewPoint = dp*100;
+
+	uint8_t humidity = h;
+
+	uint32_t pressure = p; // Pressure is 6 digits, but uint16_t supports up to 5 digits. uint32_t likely a waste of packet width.
+	
 
 	MCU_SLEEP();
 	RTC_CLEAR_STATUS();
