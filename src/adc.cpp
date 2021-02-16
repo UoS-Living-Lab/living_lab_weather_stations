@@ -22,39 +22,62 @@
 ADS1219 sensorADC(SENSOR_DATA_READY, SENSOR_ADDRESS);
 ADS1219 powerADC(PWR_DATA_READY, POWER_ADDRESS);
 
+void ADC_INIT_ALL();
+void SENSOR_PWR_PULLUP();
+void SENSOR_ADC_INIT();
+void POWER_ADC_INIT();
+float SENSOR_ADC_GET_CHANNEL(int chan);
+float POWER_ADC_GET_CHANNEL(int chan);
+
+
+void ADC_INIT_ALL()
+{
+	SENSOR_PWR_PULLUP();
+	SENSOR_ADC_INIT();
+	POWER_ADC_INIT();
+}
+
+void SENSOR_PWR_PULLUP()
+{
+	pinMode(SENSOR_PWR_EN, OUTPUT);
+	digitalWrite(SENSOR_PWR_EN, HIGH);
+}
 
 void SENSOR_ADC_INIT()
 {
 	sensorADC.begin();
-	
 	pinMode(SENSOR_DATA_READY, INPUT_PULLUP);
-	
-	pinMode(SENSOR_PWR_EN, OUTPUT);
-	digitalWrite(SENSOR_PWR_EN, HIGH);
-
-	sensorADC.setVoltageReference(REF_EXTERNAL);
+	sensorADC.setVoltageReference(REF_INTERNAL);
 }
 
 void POWER_ADC_INIT()
 {
 	powerADC.begin();
-
 	pinMode(PWR_DATA_READY, INPUT_PULLUP);
-
-	//pinMode(, OUTPUT);
-	//digitalWrite(, HIGH);
-
-	powerADC.setVoltageReference(REF_EXTERNAL);
+	powerADC.setVoltageReference(REF_INTERNAL);
 }
 
 float SENSOR_ADC_GET_CHANNEL(int chan)
 {
 	return sensorADC.readSingleEnded(chan)*2.048/pow(2,23);
-	//return sensorADC.readSingleEnded(chan);
 }
 
-float ADC_GET_DIFFERENTIAL_2_3()
+float POWER_ADC_GET_CHANNEL(int chan)
 {
-	//return sensorADC.readDifferential_2_3()*2.048/pow(2,23);
-	return sensorADC.readDifferential_2_3();
+	float powerValue = powerADC.readSingleEnded(chan)*2.048/pow(2,23);
+	switch(chan)
+	{
+		case 0:
+			return powerValue * 4;
+			break;
+		case 1:
+			return powerValue;
+			break;
+		case 2:
+			return powerValue;
+			break;
+		case 3:
+			return powerValue * 3;
+			break;
+	}
 }

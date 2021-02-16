@@ -5,6 +5,8 @@
 	Author: Ethan Bellmer 
 */
 
+void ADC_INIT_ALL();
 void SENSOR_ADC_INIT();
+void POWER_ADC_INIT();
 float SENSOR_ADC_GET_CHANNEL(int);
-float ADC_GET_DIFFERENTIAL_2_3();
+float POWER_ADC_GET_CHANNEL(int);
