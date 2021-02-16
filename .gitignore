@@ -5,5 +5,5 @@
 .vscode/ipch
 /config/ttn-apb-credentials.h
 /config/ttn-otaa-credentials.h
-/ws01/*
-/ws02/*
+/config/ws01/*
+/config/ws02/*
