@@ -7,4 +7,6 @@
 // Class Instantiations
 static TheThingsNetwork ttn(loraUSART, usbUSART, freqPlan);
 
-void INIT_TTN();
+void TTN_INIT();
+void TTN_SEND_BYTES(uint8_t payload[], port_t port = 1);
+int8_t TTN_GET_BYTES(port_t port = 1);
