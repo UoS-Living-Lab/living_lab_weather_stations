@@ -98,7 +98,7 @@ void loop()
 
 	uint8_t payload[12];
 
-	uint16_t ttemp = BME_GET_TEMP_C() * 100;	// Multiply temperature by 100 to convert it to an integer
+	int16_t ttemp = BME_GET_TEMP_C() * 100;	// Multiply temperature by 100 to convert it to an integer
 	payload[0] = highByte(ttemp);
 	payload[1] = lowByte(ttemp);
 
@@ -122,7 +122,8 @@ void loop()
 	payload[9] = highByte(sV);
 	payload[10] = lowByte(sV);
 
-	payload[11] = (uint8_t) POWER_ADC_GET_CHANNEL(1);
+	//payload[11] = (uint8_t) POWER_ADC_GET_CHANNEL(1);
+	payload[11] = (bool) SENSOR_ADC_GET_RAIN();
 
 	TTN_SEND_BYTES(payload);	// Send payload data to TTN
 
