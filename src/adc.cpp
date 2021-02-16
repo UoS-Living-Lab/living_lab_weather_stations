@@ -28,6 +28,7 @@ void SENSOR_ADC_INIT();
 void POWER_ADC_INIT();
 float SENSOR_ADC_GET_CHANNEL(int chan);
 float POWER_ADC_GET_CHANNEL(int chan);
+bool SENSOR_ADC_GET_RAIN();
 
 
 void ADC_INIT_ALL()
@@ -80,4 +81,14 @@ float POWER_ADC_GET_CHANNEL(int chan)
 			return powerValue * 3;
 			break;
 	}
+}
+
+bool SENSOR_ADC_GET_RAIN()
+{
+	bool isRain = 0;
+	if (SENSOR_ADC_GET_CHANNEL(0) < 2.5)
+	{
+		isRain = 1;
+	}
+	return isRain;
 }
