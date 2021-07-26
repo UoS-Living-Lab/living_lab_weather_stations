@@ -14,12 +14,14 @@
 #include "deviceID.h"
 
 // Variable Definitions
-#define BAT_SENSE_EN PIN_PF4
-#define RTC_INT PIN_PD2
+#define BAT_SENSE_EN 	PIN_PF4
+#define RTC_INT 		PIN_PD2
 
 //
 void setup()
 {
+	delay(3000); // Wait for USART to come up.
+
 	usbUSART.begin(9600);
 	loraUSART.begin(57600);
 
@@ -28,8 +30,7 @@ void setup()
 	usbUSART.print("Weather Station Prototype ");
 	usbUSART.println(UNIT_ID);
 
-	//ledInit();
-
+	
 	TTN_INIT(); // Initialise the LoRa radio & connect to network // Disable for testing outside of LoRa range
 	
 	I2C_INIT(); // Initialise the I2C interface
